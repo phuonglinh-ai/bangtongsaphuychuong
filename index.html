@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BẢNG XẾP HẠNG CHIẾN DỊCH TRUYỀN THÔNG</title>
-<meta name="description" content="BẢNG XẾP HẠNG CHIẾN DỊCH TRUYỀN THÔNG">
+<title>BẢNG XẾP HẠNG TRUYỀN THÔNG</title>
+<meta name="description" content="Bảng xếp hạng truyền thông">
 <!--
   ===========================================================================
   TRANG CÔNG KHAI BẢNG XẾP HẠNG CHIẾN DỊCH TRUYỀN THÔNG
@@ -15,9 +15,16 @@
   CÁCH DÙNG — đặt các thành phần sau trong CÙNG MỘT thư mục:
 
     bang-xep-hang.html   ← file này, tải 1 lần
-    data.csv             ← số liệu, ghi đè mỗi lần cập nhật
+    data-daily.csv       ← số liệu THEO NGÀY, ghi đè mỗi lần cập nhật. Có file này
+                           thì trang hiện bộ lọc Từ ngày/Đến ngày và tự tính lại
+                           (chiến dịch nào có dữ liệu trong khoảng đều được xếp hạng)
+    data.csv             ← (tùy chọn) bảng đã gộp cho 1 khoảng cố định. Chỉ dùng khi
+                           KHÔNG có data-daily.csv; khi đó trang không có bộ lọc
     anh.csv              ← (tùy chọn) bảng ánh xạ tên đơn vị -> tên file ảnh
     assets/              ← (tùy chọn) thư mục ảnh các địa phương
+
+  Khoảng ngày đang lọc nằm ở phần #tu=YYYY-MM-DD&den=YYYY-MM-DD của địa chỉ trang
+  (nút "Sao chép liên kết") — chỉ ở trình duyệt, không gửi đi đâu.
 
   ẢNH NỀN BỤC VINH DANH: trang tự lấy ảnh của đơn vị đang HẠNG NHẤT theo thứ tự
     1. Tra trong anh.csv
@@ -415,6 +422,45 @@
 
   [hidden] { display: none !important; }
 
+  /* ---------- BỘ LỌC KHOẢNG NGÀY (chỉ hiện khi nạp được data-daily.csv) ---------- */
+  .lp-filter {
+    background: var(--surface);
+    border-radius: 18px;
+    box-shadow: var(--sh-md);
+    padding: 18px 22px 16px;
+    margin-bottom: 28px;
+  }
+  .flt-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .flt-field { display: flex; flex-direction: column; gap: 5px; font-size: .7rem; font-weight: 700;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+  .flt-field input {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    color: var(--text); padding: 9px 12px; font-size: .9rem; font-family: inherit;
+    box-shadow: var(--sh-sm); text-transform: none; letter-spacing: 0; font-weight: 500;
+  }
+  .flt-field input:focus { outline: none; border-color: var(--c2); box-shadow: 0 0 0 4px var(--c2-lo); }
+  .flt-vi { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--c2); font-size: .8rem; min-height: 1.2em; }
+  .flt-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .flt-chip {
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text2);
+    border-radius: 999px; padding: 6px 14px; font-size: .8rem; font-family: inherit;
+    font-weight: 600; cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+  }
+  .flt-chip:hover { color: var(--c2); border-color: var(--c2); }
+  .flt-chip.on { background: var(--grad); border-color: transparent; color: #fff; }
+  .flt-share { margin-left: auto; }
+  .flt-sum { color: var(--text2); font-size: .85rem; margin-top: 14px; }
+  .flt-msg { font-size: .82rem; margin-top: 6px; min-height: 1.2em; color: var(--c2); font-weight: 600; }
+  .flt-msg.bad { color: #b91c1c; }
+  .flt-warn { margin-top: 8px; }
+  .flt-warn div {
+    background: #fffbeb; border: 1px solid #fde68a; color: #92400e;
+    border-radius: 10px; padding: 7px 12px; font-size: .8rem; margin-top: 6px;
+  }
+  .empty-range { text-align: center; padding: 40px 20px 20px; }
+  .empty-range h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+  .empty-range p { color: var(--muted); font-size: .9rem; margin-bottom: 14px; }
+
   /* ---------- ĐIỆN THOẠI ---------- */
   @media (max-width: 640px) {
     .wrap { padding: 0 14px 52px; }
@@ -439,7 +485,7 @@
   @media print {
     body { background: #fff; background-image: none; font-size: 11pt; }
     .wrap { max-width: none; padding: 0; }
-    .tbl-toolbar, .btn-print, .dropzone { display: none !important; }
+    .tbl-toolbar, .btn-print, .dropzone, .lp-filter { display: none !important; }
     /* Ảnh nền in ra rất tốn mực và làm mờ chữ -> bỏ hẳn khi in */
     .hero-bg, .hero-scrim, .hero-credit { display: none !important; }
     .podium-hero { background: #fff !important; box-shadow: none; padding: 0; border: 1px solid #cbd5e1; padding: 16px; }
@@ -467,8 +513,8 @@
 
   <header class="lp-header">
     <div class="lp-logo">🏆</div>
-    <h1 class="lp-title">BẢNG XẾP HẠNG CHIẾN DỊCH TRUYỀN THÔNG</h1>
-    <div class="lp-sub" id="lp-sub">ĐỢT TRUYỀN THÔNG CAO ĐIỂM THÁNG 9</div>
+    <h1 class="lp-title">BẢNG XẾP HẠNG TRUYỀN THÔNG</h1>
+    <div class="lp-sub" id="lp-sub">Bảng xếp hạng truyền thông</div>
     <div class="lp-meta" id="lp-meta" hidden>
       <span class="lp-badge" id="lp-range"></span>
       <span class="lp-updated" id="lp-updated"></span>
@@ -494,6 +540,41 @@
 
   <!-- Nội dung chính -->
   <main id="content" hidden>
+
+    <!-- Bộ lọc khoảng ngày: chỉ hiện khi đọc được data-daily.csv -->
+    <section class="lp-filter" id="filter" hidden>
+      <div class="flt-row">
+        <label class="flt-field">Từ ngày
+          <input type="date" id="f-from">
+          <span class="flt-vi" id="f-from-vi"></span>
+        </label>
+        <label class="flt-field">Đến ngày
+          <input type="date" id="f-to">
+          <span class="flt-vi" id="f-to-vi"></span>
+        </label>
+        <button type="button" class="flt-chip flt-share" id="f-share">🔗 Sao chép liên kết</button>
+      </div>
+      <div class="flt-chips" id="f-chips">
+        <button type="button" class="flt-chip" data-quick="all">Tất cả</button>
+        <button type="button" class="flt-chip" data-quick="latest">Ngày mới nhất</button>
+        <button type="button" class="flt-chip" data-quick="7">7 ngày</button>
+        <button type="button" class="flt-chip" data-quick="30">30 ngày</button>
+        <button type="button" class="flt-chip" data-quick="month">Tháng này</button>
+        <button type="button" class="flt-chip" data-quick="prevmonth">Tháng trước</button>
+      </div>
+      <div class="flt-sum" id="f-sum"></div>
+      <div class="flt-msg" id="f-msg"></div>
+      <div class="flt-warn" id="f-warn"></div>
+    </section>
+
+    <!-- Khoảng đã chọn không có dữ liệu -->
+    <section class="empty-range" id="empty-range" hidden>
+      <h2>Không có dữ liệu trong khoảng này</h2>
+      <p id="empty-msg"></p>
+      <button type="button" class="flt-chip" id="btn-all">Xem tất cả</button>
+    </section>
+
+    <div id="results">
 
     <section class="lp-stats" id="stats"></section>
 
@@ -528,6 +609,8 @@
         </table>
       </div>
     </section>
+
+    </div><!-- /#results -->
 
     <footer>
       <div id="foot-note"></div>
@@ -658,6 +741,236 @@
   }
 
   // =========================================================================
+  // 1b. SỐ LIỆU THEO NGÀY (data-daily.csv) -> tự tính lại cho khoảng ngày bất kỳ
+  //
+  //   Ngày | Mã | Tên chiến dịch | Lượt xem đầu ngày | Lượt xem cuối ngày | Số link
+  //
+  // Quy tắc "lấy tối đa": chiến dịch nào có ÍT NHẤT 1 ngày dữ liệu trong khoảng
+  // đều được xếp hạng (KHÔNG loại chiến dịch vắng ở ngày cuối như báo cáo của
+  // dashboard). Tăng trong kỳ của từng chiến dịch =
+  //   lượt xem CUỐI của ngày muộn nhất nó có dữ liệu trong khoảng
+  //   - lượt xem ĐẦU của ngày sớm nhất nó có dữ liệu trong khoảng   (âm -> 0).
+  // =========================================================================
+
+  var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  function isDailyHeader(header) {
+    var n = header.map(norm);
+    return n.indexOf('luot xem dau ngay') >= 0 && n.indexOf('luot xem cuoi ngay') >= 0;
+  }
+
+  function buildDaily(rows) {
+    var h = rows[0].map(norm);
+    var ix = {
+      date: h.indexOf('ngay'), id: h.indexOf('ma'), name: h.indexOf('ten chien dich'),
+      f: h.indexOf('luot xem dau ngay'), l: h.indexOf('luot xem cuoi ngay'), links: h.indexOf('so link')
+    };
+    if (ix.date < 0 || ix.name < 0) {
+      throw new Error('File số liệu theo ngày thiếu cột "Ngày" hoặc "Tên chiến dịch".');
+    }
+
+    var byKey = {}, order = [], dateSet = {};
+    rows.slice(1).forEach(function (r) {
+      var d = String(r[ix.date] || '').trim();
+      if (!DATE_RE.test(d)) return;
+      var name = String(r[ix.name] || '').trim();
+      var id = ix.id >= 0 ? String(r[ix.id] || '').trim() : '';
+      var key = id || ('n:' + name);       // thiếu Mã (file sửa tay) thì lấy tên làm khóa
+      if (!key || key === 'n:') return;
+      var c = byKey[key];
+      if (!c) { c = byKey[key] = { map: {} }; order.push(key); }
+      c.map[d] = {
+        d: d, name: name,
+        f: toNum(r[ix.f]), l: toNum(r[ix.l]),
+        links: ix.links >= 0 ? toNum(r[ix.links]) : 0
+      };
+      dateSet[d] = true;
+    });
+
+    var dates = Object.keys(dateSet).sort();
+    if (dates.length === 0) throw new Error('File số liệu theo ngày không có dòng dữ liệu hợp lệ.');
+
+    var camps = order.map(function (k) {
+      var m = byKey[k].map;
+      return { key: k, days: Object.keys(m).sort().map(function (d) { return m[d]; }) };
+    });
+    return { camps: camps, dates: dates, min: dates[0], max: dates[dates.length - 1] };
+  }
+
+  function addDays(key, n) {
+    var d = new Date(key + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  function daysBetween(a, b) {   // số ngày tính cả 2 đầu
+    return Math.floor((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000) + 1;
+  }
+
+  // Trả về { data (đúng dạng render() nhận), warnings[], dwd, spanDays }
+  function computeRange(daily, from, to) {
+    var items = [];
+    daily.camps.forEach(function (c) {
+      var inR = c.days.filter(function (x) { return x.d >= from && x.d <= to; });
+      if (inR.length === 0) return;
+      var first = inR[0], last = inR[inR.length - 1];
+      var raw = last.l - first.f;
+      items.push({
+        name: last.name || ('#' + c.key),   // tên của ngày muộn nhất trong khoảng
+        value: Math.max(0, raw), negative: raw < 0,
+        total: last.l, start: first.f, links: last.links, days: inR.length
+      });
+    });
+
+    var dwd = daily.dates.filter(function (d) { return d >= from && d <= to; }).length;
+    var lo = from > daily.min ? from : daily.min, hi = to < daily.max ? to : daily.max;
+    var span = hi >= lo ? daysBetween(lo, hi) : 0;   // chỉ đếm phần giao với dải dữ liệu
+
+    var warnings = [];
+    if (dwd === 1) {
+      warnings.push('Khoảng này chỉ có dữ liệu của 1 ngày (' + viDate(from > daily.min ? from : daily.min) +
+        '). "Tăng trong kỳ" chỉ phản ánh phần tăng giữa lần đo đầu và lần đo cuối của ngày đó.');
+    }
+    if (dwd > 0 && dwd < span) {
+      warnings.push('Chỉ ' + dwd + '/' + span + ' ngày trong khoảng có dữ liệu (những ngày không có dữ liệu được bỏ qua).');
+    }
+    var partial = items.filter(function (x) { return x.days < dwd; }).length;
+    if (partial > 0) {
+      warnings.push(partial + ' đơn vị không có dữ liệu đủ ' + dwd + ' ngày — xem cột "Ngày".');
+    }
+    var neg = items.filter(function (x) { return x.negative; });
+    if (neg.length > 0) {
+      warnings.push(neg.length + ' đơn vị có lượt xem cuối kỳ THẤP HƠN đầu kỳ (' +
+        neg.slice(0, 3).map(function (x) { return x.name; }).join(', ') + (neg.length > 3 ? '…' : '') +
+        ') — "Tăng trong kỳ" đã tính là 0.');
+    }
+
+    return {
+      data: { mode: MODE_RANGE, items: items, from: from, to: to },
+      warnings: warnings, dwd: dwd, span: span
+    };
+  }
+
+  // ---- Bộ lọc ngày ---------------------------------------------------------
+
+  var DAILY = null;                 // dữ liệu theo ngày; null = chế độ cố định (data.csv)
+  var RANGE = { from: '', to: '' };
+  var hashBound = false;
+
+  function setMsg(text, bad) {
+    $('f-msg').textContent = text || '';
+    $('f-msg').className = 'flt-msg' + (bad ? ' bad' : '');
+  }
+
+  function quickRange(q) {
+    var max = DAILY.max, min = DAILY.min;
+    if (q === 'all') return [min, max];
+    if (q === 'latest') return [max, max];
+    if (q === '7') return [addDays(max, -6), max];
+    if (q === '30') return [addDays(max, -29), max];
+    var ym = max.slice(0, 7);                       // tháng của ngày dữ liệu mới nhất
+    if (q === 'month') return [ym + '-01', max];
+    if (q === 'prevmonth') {
+      var lastPrev = addDays(ym + '-01', -1);       // ngày cuối tháng trước
+      return [lastPrev.slice(0, 7) + '-01', lastPrev];
+    }
+    return [min, max];
+  }
+
+  function markChips() {
+    var btns = $('f-chips').querySelectorAll('.flt-chip');
+    for (var i = 0; i < btns.length; i++) {
+      var r = quickRange(btns[i].getAttribute('data-quick'));
+      btns[i].classList.toggle('on', r[0] === RANGE.from && r[1] === RANGE.to);
+    }
+  }
+
+  function writeHash() {
+    // Khoảng mặc định (toàn bộ lịch sử) thì bỏ hash cho địa chỉ gọn
+    var isAll = RANGE.from === DAILY.min && RANGE.to === DAILY.max;
+    var h = isAll ? '' : '#tu=' + RANGE.from + '&den=' + RANGE.to;
+    try {
+      history.replaceState(null, '', location.pathname + location.search + h);
+    } catch (e) { /* mở bằng file:// hoặc khung nhúng: bỏ qua */ }
+  }
+
+  function readHash() {
+    var m = /(?:^|[#&])tu=(\d{4}-\d{2}-\d{2})/.exec(location.hash);
+    var n = /(?:^|[#&])den=(\d{4}-\d{2}-\d{2})/.exec(location.hash);
+    if (!m || !n || m[1] > n[1]) return null;
+    return [m[1], n[1]];
+  }
+
+  function applyRange(from, to) {
+    if (!DATE_RE.test(from) || !DATE_RE.test(to)) return;
+    $('f-from').value = from; $('f-to').value = to;
+    $('f-from-vi').textContent = viDate(from);
+    $('f-to-vi').textContent = viDate(to);
+    if (from > to) {
+      setMsg('"Từ ngày" phải nhỏ hơn hoặc bằng "Đến ngày".', true);
+      return;
+    }
+    setMsg('');
+    RANGE.from = from; RANGE.to = to;
+    writeHash();
+    markChips();
+
+    var res = computeRange(DAILY, from, to);
+    $('f-warn').innerHTML = res.warnings.map(function (w) { return '<div>⚠ ' + esc(w) + '</div>'; }).join('');
+
+    if (res.data.items.length === 0) {
+      $('results').hidden = true;
+      $('empty-range').hidden = false;
+      $('empty-msg').textContent = 'Dữ liệu hiện có từ ' + viDate(DAILY.min) + ' đến ' + viDate(DAILY.max) + '.';
+      $('lp-range').hidden = true;
+      $('f-sum').textContent = 'Khoảng ' + viDate(from) + ' – ' + viDate(to) + ': không có ngày nào có dữ liệu.';
+      return;
+    }
+    $('empty-range').hidden = true;
+    $('results').hidden = false;
+    render(res.data, UPDATED_TEXT);
+    $('f-sum').textContent = 'Dữ liệu từ ' + viDate(DAILY.min) + ' đến ' + viDate(DAILY.max) +
+      ' · khoảng đang xem có ' + res.dwd + (res.span ? '/' + res.span : '') + ' ngày có dữ liệu · ' +
+      res.data.items.length + ' đơn vị';
+  }
+
+  function startDaily(daily, updatedText) {
+    DAILY = daily;
+    UPDATED_TEXT = updatedText || '';
+    $('f-from').min = $('f-to').min = daily.min;
+    $('f-from').max = $('f-to').max = daily.max;
+    $('filter').hidden = false;
+    $('content').hidden = false;
+    $('state-loading').hidden = true;
+    $('state-error').hidden = true;
+
+    var h = readHash();
+    applyRange(h ? h[0] : daily.min, h ? h[1] : daily.max);
+    $('content').hidden = false;
+
+    if (!hashBound) {
+      hashBound = true;
+      window.addEventListener('hashchange', function () {
+        if (!DAILY) return;
+        var x = readHash();
+        applyRange(x ? x[0] : DAILY.min, x ? x[1] : DAILY.max);
+      });
+    }
+  }
+
+  // Chế độ cố định (data.csv cũ): không có bộ lọc
+  function enterFixed() {
+    DAILY = null;
+    $('filter').hidden = true;
+    $('empty-range').hidden = true;
+    $('results').hidden = false;
+  }
+
+  function onFilterInput() {
+    if (!$('f-from').value || !$('f-to').value) return;
+    applyRange($('f-from').value, $('f-to').value);
+  }
+
+  // =========================================================================
   // 2. ẢNH NỀN BỤC VINH DANH
   // =========================================================================
 
@@ -711,19 +1024,38 @@
     return list;
   }
 
+  // Trang có thể vẽ lại nhiều lần (đổi khoảng ngày) nên phải GỠ ảnh cũ khi hạng
+  // nhất đổi, và bỏ qua kết quả tải muộn của lần vẽ trước (heroReq).
+  var heroShown = null;   // tên đơn vị đang hiện ảnh nền
+  var heroReq = 0;
+
+  function clearHero() {
+    heroReq++;
+    heroShown = null;
+    $('podium-hero').classList.remove('has-img');
+    $('hero-bg').style.backgroundImage = '';
+    $('hero-credit').hidden = true;
+    $('hero-credit').textContent = '';
+  }
+
   // Thử tải lần lượt, ảnh nào tải được trước thì dùng. Không có ảnh nào thì
   // giữ nguyên nền gradient — KHÔNG bao giờ hiện biểu tượng ảnh vỡ.
   function applyHeroImage(name) {
+    if (heroShown === name) return;   // hạng nhất không đổi: ảnh đã đúng, khỏi nhấp nháy
+    clearHero();
+    var req = heroReq;
     ensureImageMap().then(function (map) {
       var list = heroCandidates(map, name);
       (function tryNext(i) {
-        if (i >= list.length) return;
+        if (i >= list.length || req !== heroReq) return;
         var probe = new Image();
         probe.onload = function () {
+          if (req !== heroReq) return;
           $('hero-bg').style.backgroundImage = 'url("' + list[i].replace(/"/g, '%22') + '")';
           $('podium-hero').classList.add('has-img');
           $('hero-credit').textContent = '🏞 Ảnh: ' + name;
           $('hero-credit').hidden = false;
+          heroShown = name;
         };
         probe.onerror = function () { tryNext(i + 1); };
         probe.src = list[i];
@@ -752,9 +1084,11 @@
 
   var DATA = null;
   var LABEL_MAIN = 'Lượt xem';
+  var UPDATED_TEXT = '';
 
   function render(data, updatedText) {
     DATA = data;
+    UPDATED_TEXT = updatedText || '';
     LABEL_MAIN = data.mode === MODE_RANGE ? 'Tăng trong kỳ' : 'Lượt xem';
 
     // Luôn xếp giảm dần theo chỉ số chính, không phụ thuộc thứ tự dòng trong file
@@ -809,7 +1143,7 @@
 
   function renderPodium(data) {
     var top = data.items.slice(0, 3);
-    if (top.length < 3) { $('podium-wrap').hidden = true; return; }
+    if (top.length < 3) { $('podium-wrap').hidden = true; clearHero(); return; }
     $('podium-wrap').hidden = false;
 
     var MEDAL = ['🥇', '🥈', '🥉'];
@@ -859,9 +1193,12 @@
       opts.push(['total-desc', 'Lũy kế cuối kỳ (cao → thấp)']);
     }
     opts.push(['name-asc', 'Tên (A → Z)']);
+    // Vẽ lại khi đổi khoảng ngày: giữ lựa chọn sắp xếp người xem đang chọn
+    var prev = $('sort').value;
     $('sort').innerHTML = opts.map(function (o) {
       return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>';
     }).join('');
+    if (prev && opts.some(function (o) { return o[0] === prev; })) $('sort').value = prev;
   }
 
   function renderHead(data) {
@@ -932,12 +1269,48 @@
   //             -> khung kéo-thả (khi mở bằng file:// hoặc thiếu data.csv)
   // =========================================================================
 
+  // Nhận cả 2 định dạng, phân biệt theo tiêu đề cột:
+  //   - theo ngày (data-daily.csv)  -> chế độ LỌC khoảng ngày
+  //   - đã gộp (data.csv 9 cột / 3 cột cũ) -> chế độ CỐ ĐỊNH, ẩn bộ lọc
   function loadFromText(text, updatedText) {
     try {
-      render(buildData(parseCsv(text)), updatedText);
+      var rows = parseCsv(text);
+      if (rows.length > 0 && isDailyHeader(rows[0])) {
+        startDaily(buildDaily(rows), updatedText);
+      } else {
+        enterFixed();
+        render(buildData(rows), updatedText);
+      }
     } catch (err) {
       showError('Không đọc được số liệu', esc(err.message));
     }
+  }
+
+  // Tải 1 file CSV cùng thư mục. Trả về { text, updated } hoặc null nếu không có/lỗi.
+  function fetchCsv(name) {
+    // Thêm tham số thời gian để trình duyệt không dùng lại bản cũ
+    return fetch(name + '?v=' + Date.now(), { cache: 'no-store' })
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var lm = resp.headers.get('Last-Modified');
+        var upd = '';
+        if (lm) {
+          var d = new Date(lm);
+          if (!isNaN(d.getTime())) {
+            upd = 'Số liệu cập nhật: ' + d.toLocaleString('vi-VN', {
+              day: '2-digit', month: '2-digit', year: 'numeric',
+              hour: '2-digit', minute: '2-digit'
+            });
+          }
+        }
+        return resp.text().then(function (t) { return { text: t, updated: upd }; });
+      })
+      .catch(function () { return null; });
+  }
+
+  function looksDaily(text) {
+    var rows = parseCsv(text.slice(0, 2000));
+    return rows.length > 0 && isDailyHeader(rows[0]);
   }
 
   function boot() {
@@ -956,28 +1329,21 @@
       return;
     }
 
-    // Thêm tham số thời gian để trình duyệt không dùng lại bản data.csv cũ
-    fetch('data.csv?v=' + Date.now(), { cache: 'no-store' })
-      .then(function (resp) {
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        var lm = resp.headers.get('Last-Modified');
-        var upd = '';
-        if (lm) {
-          var d = new Date(lm);
-          if (!isNaN(d.getTime())) {
-            upd = 'Số liệu cập nhật: ' + d.toLocaleString('vi-VN', {
-              day: '2-digit', month: '2-digit', year: 'numeric',
-              hour: '2-digit', minute: '2-digit'
-            });
-          }
-        }
-        return resp.text().then(function (t) { loadFromText(t, upd); });
-      })
-      .catch(function () {
+    // Ưu tiên data-daily.csv (có bộ lọc ngày). Thiếu file, hoặc hosting trả 200 +
+    // trang HTML thay cho file thiếu (không đúng định dạng) -> lặng lẽ rơi về
+    // data.csv như bản cũ.
+    fetchCsv('data-daily.csv').then(function (daily) {
+      if (daily && looksDaily(daily.text)) {
+        loadFromText(daily.text, daily.updated);
+        return;
+      }
+      return fetchCsv('data.csv').then(function (fixed) {
+        if (fixed) { loadFromText(fixed.text, fixed.updated); return; }
         showError('Chưa có file số liệu',
-          'Không tìm thấy (hoặc không đọc được) file <code>data.csv</code> trong cùng thư mục với trang này. ' +
-          'Hãy tải <code>data.csv</code> từ dashboard và upload vào đúng thư mục này.');
+          'Không tìm thấy (hoặc không đọc được) file <code>data-daily.csv</code> hay <code>data.csv</code> ' +
+          'trong cùng thư mục với trang này. Hãy upload file số liệu từ hệ thống vào đúng thư mục này.');
       });
+    });
   }
 
   // --- Kéo-thả / chọn file thủ công ---
@@ -1008,6 +1374,28 @@
     fr.onerror = function () { showError('Không đọc được file', 'Vui lòng thử lại với file CSV khác.'); };
     fr.readAsText(file, 'utf-8');
   }
+
+  // --- Bộ lọc khoảng ngày ---
+  $('f-from').addEventListener('change', onFilterInput);
+  $('f-to').addEventListener('change', onFilterInput);
+  $('f-chips').addEventListener('click', function (e) {
+    var q = e.target && e.target.getAttribute && e.target.getAttribute('data-quick');
+    if (!q || !DAILY) return;
+    var r = quickRange(q);
+    applyRange(r[0], r[1]);
+  });
+  $('btn-all').addEventListener('click', function () {
+    if (DAILY) applyRange(DAILY.min, DAILY.max);
+  });
+  $('f-share').addEventListener('click', function () {
+    var url = location.href;
+    function done() { setMsg('Đã sao chép liên kết — gửi cho người khác để họ mở đúng khoảng ngày này.'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, function () { window.prompt('Sao chép liên kết:', url); });
+    } else {
+      window.prompt('Sao chép liên kết:', url);
+    }
+  });
 
   $('q').addEventListener('input', applyFilter);
   $('sort').addEventListener('change', applyFilter);
